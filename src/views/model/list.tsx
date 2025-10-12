@@ -1,29 +1,20 @@
 import { List } from "@raycast/api";
-import { Model, AvailableModel } from "../../type";
-import { getModelDisplayName } from "../../api/models";
+import { Model } from "../../type";
 
 export const ModelListView = ({
   title,
   models,
   selectedModel,
   actionPanel,
-  availableModels,
 }: {
   title: string;
   models: Model[];
   selectedModel: string | null;
   actionPanel: (model: Model) => JSX.Element;
-  availableModels?: AvailableModel[];
 }) => (
   <List.Section title={title} subtitle={models.length.toLocaleString()}>
     {models.map((model) => (
-      <ModelListItem
-        key={model.id}
-        model={model}
-        selectedModel={selectedModel}
-        actionPanel={actionPanel}
-        availableModels={availableModels}
-      />
+      <ModelListItem key={model.id} model={model} selectedModel={selectedModel} actionPanel={actionPanel} />
     ))}
   </List.Section>
 );
@@ -32,12 +23,10 @@ export const ModelListItem = ({
   model,
   selectedModel,
   actionPanel,
-  availableModels,
 }: {
   model: Model;
   selectedModel: string | null;
   actionPanel: (model: Model) => JSX.Element;
-  availableModels?: AvailableModel[];
 }) => {
   return (
     <List.Item
@@ -45,19 +34,14 @@ export const ModelListItem = ({
       key={model.id}
       title={model.name}
       accessories={[{ text: new Date(model.updated_at ?? 0).toLocaleDateString() }]}
-      detail={<ModelDetailView model={model} availableModels={availableModels} />}
+      detail={<ModelDetailView model={model} />}
       actions={selectedModel === model.id ? actionPanel(model) : undefined}
     />
   );
 };
 
-const ModelDetailView = (props: {
-  model: Model;
-  markdown?: string | null | undefined;
-  availableModels?: AvailableModel[];
-}) => {
-  const { model, markdown, availableModels } = props;
-  const displayName = availableModels ? getModelDisplayName(model.option, availableModels) : model.option;
+const ModelDetailView = (props: { model: Model; markdown?: string | null | undefined }) => {
+  const { model, markdown } = props;
 
   return (
     <List.Item.Detail
@@ -65,9 +49,8 @@ const ModelDetailView = (props: {
       metadata={
         <List.Item.Detail.Metadata>
           <List.Item.Detail.Metadata.TagList title="Model">
-            <List.Item.Detail.Metadata.TagList.Item text={displayName} />
+            <List.Item.Detail.Metadata.TagList.Item text={model.option} />
           </List.Item.Detail.Metadata.TagList>
-          <List.Item.Detail.Metadata.Label title="Model ID" text={model.option} />
           <List.Item.Detail.Metadata.Label title="Temperature" text={model.temperature.toLocaleString()} />
           {model.max_tokens && (
             <List.Item.Detail.Metadata.Label title="Max tokens" text={model.max_tokens.toLocaleString()} />

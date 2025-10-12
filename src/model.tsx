@@ -97,7 +97,6 @@ export default function Model() {
             model={defaultModelOnly}
             selectedModel={selectedModelId}
             actionPanel={getActionPanel}
-            availableModels={models.availableModels}
           />
           <ModelListView
             key="pinned"
@@ -105,7 +104,6 @@ export default function Model() {
             models={customModelsOnly.filter((x) => x.pinned)}
             selectedModel={selectedModelId}
             actionPanel={getActionPanel}
-            availableModels={models.availableModels}
           />
           <ModelListView
             key="models"
@@ -113,7 +111,6 @@ export default function Model() {
             models={customModelsOnly.filter((x) => !x.pinned)}
             selectedModel={selectedModelId}
             actionPanel={getActionPanel}
-            availableModels={models.availableModels}
           />
         </>
       )}

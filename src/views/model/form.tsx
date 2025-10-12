@@ -1,5 +1,5 @@
 import { Action, ActionPanel, Form, Icon, showToast, Toast, useNavigation } from "@raycast/api";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormValidation, useFetch, useForm } from "@raycast/utils";
 import { v4 as uuidv4 } from "uuid";
 import { Model, ModelHook, CSVPrompt } from "../../type";
@@ -9,18 +9,6 @@ export const ModelForm = (props: { model?: Model; use: { models: ModelHook }; na
   const { use, model } = props;
   const { pop } = useNavigation();
   const [selectedModel, setSelectedModel] = useState(model?.option ?? "claude-3-5-haiku-latest");
-  const [isLoadingModels, setIsLoadingModels] = useState(false);
-  const [userEditedName, setUserEditedName] = useState(false);
-
-  // Refresh available models when form is opened
-  useEffect(() => {
-    const refreshModels = async () => {
-      setIsLoadingModels(true);
-      await use.models.refreshAvailableModels();
-      setIsLoadingModels(false);
-    };
-    refreshModels();
-  }, []);
 
   const { handleSubmit, itemProps, setValue } = useForm<Model>({
     onSubmit: async (model) => {
@@ -112,7 +100,7 @@ export const ModelForm = (props: { model?: Model; use: { models: ModelHook }; na
     },
   });
 
-  const MODEL_OPTIONS = use.models.availableModels;
+  const MODEL_OPTIONS = use.models.option;
 
   const { isLoading, data } = useFetch<CSVPrompt[]>(
     "https://gist.githubusercontent.com/florisdobber/35f702f0bab6816ac847b182be6f4903/raw/2f6a8296dc5818d76ed594b318e064f9983e0715/prompts.csv",
@@ -147,41 +135,7 @@ export const ModelForm = (props: { model?: Model; use: { models: ModelHook }; na
         </ActionPanel>
       }
     >
-      <Form.Dropdown
-        title="Model"
-        placeholder="Choose model option"
-        isLoading={isLoadingModels}
-        {...itemProps.option}
-        onChange={(newValue) => {
-          setSelectedModel(newValue);
-          setValue("option", newValue);
-
-          // Auto-populate name with display name if user hasn't manually edited it
-          if (!userEditedName) {
-            const selectedModelData = MODEL_OPTIONS.find((m) => m.id === newValue);
-            if (selectedModelData) {
-              setValue("name", selectedModelData.display_name);
-            }
-          }
-        }}
-      >
-        {MODEL_OPTIONS.map((option) => (
-          <Form.Dropdown.Item
-            value={option.id}
-            title={`${option.display_name} (${option.id})`}
-            key={option.id}
-          />
-        ))}
-      </Form.Dropdown>
-      <Form.TextField
-        title="Name"
-        placeholder="Name your model"
-        {...itemProps.name}
-        onChange={(value) => {
-          setUserEditedName(true);
-          setValue("name", value);
-        }}
-      />
+      <Form.TextField title="Name" placeholder="Name your model" {...itemProps.name} />
       {showAnthropicPrompts && (
         <Form.Dropdown
           id="template"
@@ -209,7 +163,20 @@ export const ModelForm = (props: { model?: Model; use: { models: ModelHook }; na
         })`}
         {...itemProps.max_tokens}
       />
-      {(!model || model.id !== "default") && <Form.Checkbox title="Pinned" label="Pin model" {...itemProps.pinned} />}
+      <Form.Dropdown
+        title="Model"
+        placeholder="Choose model option"
+        {...itemProps.option}
+        onChange={(newValue) => {
+          setSelectedModel(newValue);
+          setValue("option", newValue);
+        }}
+      >
+        {MODEL_OPTIONS.map((option) => (
+          <Form.Dropdown.Item value={option} title={option} key={option} />
+        ))}
+      </Form.Dropdown>
+      {model?.id !== "default" && <Form.Checkbox title="Pinned" label="Pin model" {...itemProps.pinned} />}
     </Form>
   );
 };

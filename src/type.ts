@@ -5,12 +5,6 @@ export type Message = {
   content: string;
 };
 
-export interface AvailableModel {
-  id: string;
-  display_name: string;
-  created_at: string;
-}
-
 export interface Question {
   id: string;
   question: string;
@@ -73,8 +67,7 @@ export type QuestionHook = BaseHook<string> & { update: PromiseFunctionWithOneAr
 
 export type ModelHook = Hook<Model> & {
   update: PromiseFunctionWithOneArg<Model>;
-  availableModels: AvailableModel[];
-  refreshAvailableModels: () => Promise<void>;
+  option: Model["option"][];
 };
 
 export interface ChatHook {

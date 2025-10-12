@@ -44,10 +44,8 @@ Got the answer that you wanted? Great.
 
 # Models available
 
-## Claude 4 Family
+## Claude 4
 
-- `claude-sonnet-4-5-20250929`
-- `claude-opus-4-1-20250805`
 - `claude-sonnet-4-20250514`
 
 ## Claude 3.7
